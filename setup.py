@@ -15,7 +15,7 @@ setup(
     author_email='andrerussi002@gmail.com',
     url='https://github.com/andretocci/personal_totivator',
     packages=['personal_totivator'],
-    install_requires=['numpy', 'pandas','matplotlib', 'seaborn', 're', 'datetime', 'google.colab', 'ast' ],
+    install_requires=['numpy', 'pandas', 'google.colab' ],
     license="Apache License 2.0",
     classifiers=[
         "Programming Language :: Python :: 3",
