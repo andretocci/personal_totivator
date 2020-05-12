@@ -3,93 +3,6 @@ import re
 from google.colab import drive
 import ast
 
-#############
-## Funções ##
-#############
-
-def tratamento_caracteres(texto_list):      
-"""
-Função:
-    - Retira os espaços por '_';
-    - Substitúi caracteres especiais;
-    - Remove espaços em branco do final;
-"""
-
-#Lista que será substituída
-lista_replace = [ (' ', '_'),
-                (r'à|á|ã', 'a'),
-                (r'ç', 'c'),
-                (r'õ|ó|ò', 'o'),
-                (r'é|ê', 'e'),
-                (r'í|ì', 'i'),
-                (r'ú|ù', 'u')]
-res = []
-
-if isinstance(texto_list, str):
-    texto = texto_list.lower()
-
-    for termo in lista_replace:
-    texto = re.sub(termo[0], termo[1], texto)
-    
-    #Removendo último caracterte em branco
-    try:
-    while texto[-1] == '_':
-        texto = texto[0:-1]
-    except:
-    pass
-    res = texto
-
-else:
-
-    for texto in texto_list:
-    texto = texto.lower()
-
-    for termo in lista_replace:
-        texto = re.sub(termo[0], termo[1], texto)
-
-    try:
-        while texto[-1] == '_':
-        texto = texto[0:-1]
-    except:
-        pass
-
-    res.append(texto)
-return res
-
-def questionator_validator(questionamento, value_type = None, exp_values = []):           
-
-if len(exp_values) == 0:
-    while True:  
-    value = input(questionamento)       
-    try:
-        value = value_type(value)
-        break
-    except:
-        print("\n BROOO não te pedi isso, tente de novo! Beijos \n ")
-        pass
-else:
-    while True:  
-    value = tratamento_caracteres(input(questionamento)) 
-    if value in exp_values:
-        break
-    else:
-        print("\n BROOO não te pedi isso, tente de novo! Beijos \n ")
-        pass
-
-
-return value  
-def cadastrar_novas_atividades(self):
-
-if len(self.minhas_atividades) == 0:
-    self.minhas_atividades = {}
-
-quantidade_de_atividades = questionator_validator('### Quantas atividades gostaria de cadastrar? \n', int)
-print(" \n### Agora me fala quais são essas atividades?\n")
-for i in range(0, quantidade_de_atividades):        
-    atividade = questionator_validator("Qual seria a atividade número " + str(i + 1) + "? \n", str)
-    tempo_min = questionator_validator("E quanto tempo(em minutos) por pretende atuar nela diáriamente? \n", float)
-    self.minhas_atividades[atividade] = {'tempo_min': tempo_min,
-                                        'data_cadastro': self.today}
 
 class personal_totivator:
 
@@ -190,6 +103,98 @@ class personal_totivator:
     with open(self.drive_path + self.drive_filename + '.json', 'w') as f:
       f.write(str({'self.minhas_atividades': self.minhas_atividades,
                     'self.log_atividades' : self.log_atividades}))
+
+  
+#############
+## Funções ##
+#############
+
+def tratamento_caracteres(self, texto_list):   
+      
+  """
+  Função:
+      - Retira os espaços por '_';
+      - Substitúi caracteres especiais;
+      - Remove espaços em branco do final;
+  """
+
+  #Lista que será substituída
+  lista_replace = [ (' ', '_'),
+                  (r'à|á|ã', 'a'),
+                  (r'ç', 'c'),
+                  (r'õ|ó|ò', 'o'),
+                  (r'é|ê', 'e'),
+                  (r'í|ì', 'i'),
+                  (r'ú|ù', 'u')]
+  res = []
+
+  if isinstance(texto_list, str):
+      texto = texto_list.lower()
+
+      for termo in lista_replace:
+      texto = re.sub(termo[0], termo[1], texto)
+      
+      #Removendo último caracterte em branco
+      try:
+      while texto[-1] == '_':
+          texto = texto[0:-1]
+      except:
+      pass
+      res = texto
+
+  else:
+
+      for texto in texto_list:
+      texto = texto.lower()
+
+      for termo in lista_replace:
+          texto = re.sub(termo[0], termo[1], texto)
+
+      try:
+          while texto[-1] == '_':
+          texto = texto[0:-1]
+      except:
+          pass
+
+      res.append(texto)
+  return res
+
+  def questionator_validator(self, questionamento, value_type = None, exp_values = []): 
+
+
+    if len(exp_values) == 0:
+        while True:  
+        value = input(questionamento)       
+        try:
+            value = value_type(value)
+            break
+        except:
+            print("\n BROOO não te pedi isso, tente de novo! Beijos \n ")
+            pass
+    else:
+        while True:  
+        value = tratamento_caracteres(input(questionamento)) 
+        if value in exp_values:
+            break
+        else:
+            print("\n BROOO não te pedi isso, tente de novo! Beijos \n ")
+            pass
+
+
+    return value  
+    
+  def cadastrar_novas_atividades(self):
+
+  if len(self.minhas_atividades) == 0:
+      self.minhas_atividades = {}
+
+  quantidade_de_atividades = questionator_validator('### Quantas atividades gostaria de cadastrar? \n', int)
+  print(" \n### Agora me fala quais são essas atividades?\n")
+  for i in range(0, quantidade_de_atividades):        
+      atividade = questionator_validator("Qual seria a atividade número " + str(i + 1) + "? \n", str)
+      tempo_min = questionator_validator("E quanto tempo(em minutos) por pretende atuar nela diáriamente? \n", float)
+      self.minhas_atividades[atividade] = {'tempo_min': tempo_min,
+                                          'data_cadastro': self.today}
 
 
 
