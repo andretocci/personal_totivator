@@ -204,7 +204,7 @@ class personal_totivator:
                     'self.log_atividades' : self.log_atividades}))
       
   def minhas_atividades_df(self):
-    minhas_atividades_df = pd.DataFrame(personal_t2.minhas_atividades).T
+    minhas_atividades_df = pd.DataFrame(self.minhas_atividades).T
     minhas_atividades_df = minhas_atividades_df.reset_index()
     minhas_atividades_df.columns = ['Atividades', 'Meta_por_dia', 'data_cadastro']
 
@@ -213,7 +213,7 @@ class personal_totivator:
   def log_atividades_df(self):
 
     #Tratando DF de Log de atividades
-    log_atividades_df = pd.DataFrame(personal_t2.log_atividades)
+    log_atividades_df = pd.DataFrame(self.log_atividades)
     log_atividades_df.index.name = 'Atividades'
     log_atividades_df = log_atividades_df.reset_index()
     log_atividades_df = pd.melt(log_atividades_df, 'Atividades', var_name='data', value_name='tempo')
@@ -249,11 +249,17 @@ class personal_totivator:
                       fontsize=16, color='Black',ha='center', bbox=dict(facecolor='white', alpha=0.8)) 
       
 
-  def plot_log_atividades(self, dados_cumulativos = False, plot_type = sns.barplot, date_range = None, figsize=(11,7), sharex=True):
+  def plot_log_atividades(self, 
+                          dados_cumulativos = False, 
+                          plot_type =  sns.barplot, 
+                          date_range = None, 
+                          figsize=(11,7), 
+                          sharex=True):
     """
     """
 
     log_atividades_df = self.log_atividades_df()
+    log_atividades_df = pd.merge( log_atividades_df, self.minhas_atividades_df()[['Atividades', 'Meta_por_dia']], how='left', on='Atividades')
 
     if date_range is not None:
       log_atividades_df = log_atividades_df[date_range]
@@ -268,22 +274,26 @@ class personal_totivator:
     quantidade_atividades = len(self.minhas_atividades)
     fig2, axs = plt.subplots(figsize= figsize, nrows= (quantidade_atividades), sharex=sharex)
 
-    for axe, ativ, cor in zip(axs, self.minhas_atividades, self.color_palette):
+    for axe, ativ, cor in zip(axs, self.minhas_atividades.keys(), self.color_palette):
       #Tratando o DF
       df_plot = log_atividades_df[log_atividades_df.Atividades == ativ].copy()   
 
       if dados_cumulativos:
-        df_plot['tempo_acumulado'] = df_plot['tempo'].cumsum()
-        y = 'tempo_acumulado'
+        df_plot['1.realizado_acumulado'] = df_plot['tempo'].cumsum()
+        df_plot['2.planejado_acumulada'] = df_plot['Meta_por_dia'].cumsum()
+        df_plot = pd.melt(df_plot[['Atividades', 'data', '1.realizado_acumulado', '2.planejado_acumulada']], id_vars=['Atividades', 'data'])
       else:
-        y = 'tempo'
+        df_plot.columns = ['Atividades', 'data', '1.realizado', '2.planejado']
+        df_plot = pd.melt(df_plot, id_vars=['Atividades', 'data'])
 
       #Plot 1
       plot_type(data = df_plot,
                   x = 'data',
-                  y = y,
-                  color = cor,
+                  y = 'value',
+                  hue = 'variable',
+                  palette = [cor, 'gray'],
                   ax = axe)
+      axe.legend(frameon=True, fancybox=True,loc='lower right')
       axe.set_xlabel('')
       axe.set_ylabel('')
       axe.set_title(ativ)
@@ -292,6 +302,3 @@ class personal_totivator:
     sns.despine(bottom = True, left = True)
     #ajusta o layout dos subplots
     plt.tight_layout()
-
-
- 
