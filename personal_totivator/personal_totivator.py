@@ -71,7 +71,8 @@ def questionator_validator(questionamento, value_type = None, exp_values = []):
         value = value_type(value)
         break
       except:
-        print("\n BROOO não te pedi isso, tente de novo! Beijos \n ")
+        print("\n BROOO não te pedi isso, tente de novo! Beijos \n")
+        print("Você tem as seguintes opções:\n", ';\n;'.join(exp_values))
         pass
   else:
     while True:  
@@ -116,6 +117,9 @@ class personal_totivator:
         self.minhas_atividades = minhas_atividades['self.minhas_atividades']
         self.log_atividades = minhas_atividades['self.log_atividades']
         atividades_log = False
+        self.atividades_arquivadas = minhas_atividades['self.atividades_arquivadas']
+      self.color_palette = sns.color_palette("Set1", n_colors=len(self.minhas_atividades), desat=.5)
+    else:
       self.color_palette = sns.color_palette("Set1", n_colors=len(self.minhas_atividades), desat=.5)
 
     
@@ -123,6 +127,7 @@ class personal_totivator:
       self.minhas_atividades = {}
       self.log_atividades = None
       self.cadastrar_novas_atividades()
+      self.atividades_arquivadas = {}
     else:
       #self.minhas_atividades = atividades_log
       pass
@@ -185,7 +190,7 @@ class personal_totivator:
       for i in self.minhas_atividades:
         atividades = i
         meta = self.minhas_atividades[i]['tempo_min'] 
-        print('\nPara a atividade:############\n' + atividades + '\nvocê indicou que atuaria:#############\n' + str(meta) + ' minutos diários...'  )
+        print('\nPara a atividade:############\n' + atividades + '\nvocê indicou que atuaria:\n#############\n' + str(meta) + ' minutos diários...'  )
         tempo_hoje = questionator_validator('\n####\nQuantos minutos foram realizados da atividade ' + atividades + ' hoje?\n', float)
         self.log_atividades[self.today][atividades] = tempo_hoje
 
@@ -201,7 +206,8 @@ class personal_totivator:
     # make new JSON file
     with open(self.drive_path + self.drive_filename + '.json', 'w') as f:
       f.write(str({'self.minhas_atividades': self.minhas_atividades,
-                    'self.log_atividades' : self.log_atividades}))
+                    'self.log_atividades' : self.log_atividades,
+                   'self.atividades_arquivadas': self.atividades_arquivadas}))
       
   def minhas_atividades_df(self):
     minhas_atividades_df = pd.DataFrame(self.minhas_atividades).T
@@ -209,6 +215,27 @@ class personal_totivator:
     minhas_atividades_df.columns = ['Atividades', 'Meta_por_dia', 'data_cadastro']
 
     return minhas_atividades_df
+
+  def arquivar_atividades(self, atividade):
+
+    if isinstance(atividade, str):
+      atividade = [atividade]
+
+    remover = []
+    for ativ in atividade:
+      while ativ not in self.minhas_atividades:
+        print('###\nNão encontramos a seguinte atividade nos seus cadastros:\n', ativ)
+        print('\n###Essas são suas atividades cadastradas:\n\n', ';\n'.join(self.minhas_atividades.keys()))
+        ativ = questionator_validator('##############################\nQual seria a atividade que gostaria de remover??\n', 
+                                         exp_values = self.minhas_atividades.keys())
+        if ativ in self.minhas_atividades:
+          continue
+      remover.append(ativ)
+      
+    return ativ
+
+
+
 
   def log_atividades_df(self):
 
@@ -278,6 +305,55 @@ class personal_totivator:
       #Tratando o DF
       df_plot = log_atividades_df[log_atividades_df.Atividades == ativ].copy()   
 
+      df_plot.columns = ['Atividades', 'data', '1.realizado', '2.planejado']
+
+      #Plot 1
+      plot_type(data = df_plot,
+                  x = 'data',
+                  y = '1.realizado',
+                  palette = cor,
+                  ax = axe)
+      axe.legend(frameon=True, fancybox=True,loc='lower right')
+      axe.set_xlabel('')
+      axe.set_ylabel('')
+      axe.set_title(ativ)
+      axe.axhline(y = self.minhas_atividades[ativ])
+      axe.set_facecolor('white')
+
+    # Turns off grid on the left Axis.
+    sns.despine(bottom = True, left = True)
+    #ajusta o layout dos subplots
+    plt.tight_layout()
+
+  def plot_log_atividades(self, 
+                          dados_cumulativos = False, 
+                          plot_type =  sns.barplot, 
+                          date_range = None, 
+                          figsize=(11,7), 
+                          sharex=True):
+    """
+    """
+
+    log_atividades_df = self.log_atividades_df()
+    log_atividades_df = pd.merge( log_atividades_df, self.minhas_atividades_df()[['Atividades', 'Meta_por_dia']], how='left', on='Atividades')
+
+    if date_range is not None:
+      log_atividades_df = log_atividades_df[date_range]
+
+    ###########
+    ## Plots ##
+    ###########
+
+    ### Graficos de Atividades diarias
+    ##################################
+
+    quantidade_atividades = len(self.minhas_atividades)
+    fig2, axs = plt.subplots(figsize= figsize, nrows= (quantidade_atividades), sharex=sharex)
+
+    for axe, ativ, cor in zip(axs, self.minhas_atividades.keys(), self.color_palette):
+      #Tratando o DF
+      df_plot = log_atividades_df[log_atividades_df.Atividades == ativ].copy()   
+
       if dados_cumulativos:
         df_plot['1.realizado_acumulado'] = df_plot['tempo'].cumsum()
         df_plot['2.planejado_acumulada'] = df_plot['Meta_por_dia'].cumsum()
@@ -297,6 +373,7 @@ class personal_totivator:
       axe.set_xlabel('')
       axe.set_ylabel('')
       axe.set_title(ativ)
+      axe.set_facecolor('white')
 
     # Turns off grid on the left Axis.
     sns.despine(bottom = True, left = True)
