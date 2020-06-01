@@ -167,8 +167,8 @@ class personal_totivator:
     quantidade_de_atividades = questionator_validator('### Quantas atividades gostaria de cadastrar? \n', int)
     print(" \n### Agora me fala quais são essas atividades?\n")
     for i in range(0, quantidade_de_atividades):        
-      atividade = questionator_validator("Qual seria a atividade número " + str(i + 1) + "? \n", str)
-      tempo_min = questionator_validator("E quanto tempo(em minutos) por pretende atuar nela diáriamente? \n", float)
+      atividade = questionator_validator(">>> Qual seria a atividade número " + str(i + 1) + "? \n", str)
+      tempo_min = questionator_validator(">>> E quanto tempo(em minutos) por pretende atuar nela diáriamente? \n", float)
       self.minhas_atividades[atividade] = {'tempo_min': tempo_min,
                                             'data_cadastro': self.today}
 
@@ -219,7 +219,7 @@ class personal_totivator:
       for i in self.minhas_atividades:
         atividades = i
         meta = self.minhas_atividades[i]['tempo_min'] 
-        print('\nPara a atividade:\n>n' + atividades + '\nvocê indicou que atuaria:\n#############\n' + str(meta) + ' minutos diários...'  )
+        print('\n>>> Para a atividade:\n' + atividades + '\n>>> você indicou que atuaria:\n' + str(meta) + ' minutos diários...'  )
         tempo_hoje = questionator_validator('\n####\nQuantos minutos foram realizados da atividade ' + atividades + ' hoje?\n', float)
         self.log_atividades[self.today][atividades] = tempo_hoje
 
@@ -234,10 +234,7 @@ class personal_totivator:
 
     # make new JSON file
     with open(self.drive_path + self.drive_filename + '.json', 'w') as f:
-      f.write(str({'self.minhas_atividades': self.minhas_atividades,
-                   'self.log_atividades' : self.log_atividades,
-                   'self.atividades_arquivadas': self.atividades_arquivadas,
-                   'self.color_palette': self.color_palette}))
+      f.write(str(self.__dict__))
 
   def arquivar_atividades(self, atividade):
 
