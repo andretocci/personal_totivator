@@ -347,6 +347,7 @@ class personal_totivator:
       
 
   def plot_log_atividades(self, 
+                          fill_missing_days=False,
                           dados_cumulativos = False, 
                           plot_type =  sns.barplot, 
                           date_range = None, 
@@ -355,7 +356,7 @@ class personal_totivator:
     """
     """
 
-    log_atividades_df = self.log_atividades_df(fill_missing_days=True)
+    log_atividades_df = self.log_atividades_df(fill_missing_days=fill_missing_days)
     self.atualizar_paleta()
     log_atividades_df = pd.merge( log_atividades_df, self.minhas_atividades_df()[['Atividades', 'Meta_por_dia']], how='left', on='Atividades')
 
