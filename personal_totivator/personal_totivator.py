@@ -75,7 +75,7 @@ def questionator_validator(questionamento, value_type = None, exp_values = []):
         pass
   else:
     while True:
-      input(questionamento)
+      value = input(questionamento)
       value_tratado = tratamento_caracteres(value) 
       if value_tratado in tratamento_caracteres(exp_values):
         break
@@ -248,7 +248,7 @@ class personal_totivator:
     for ativ in atividade:
       while ativ not in self.minhas_atividades:
         print('###\nNão encontramos a seguinte atividade nos seus cadastros:\n', ativ)
-        print('\n###Essas são suas atividades cadastradas:\n\n', ';\n'.join(self.minhas_atividades.keys()))
+        print('\n#####################################\nEssas são suas atividades cadastradas:\n\n', ';\n'.join(self.minhas_atividades.keys()))
         ativ = questionator_validator('##############################\nQual seria a atividade que gostaria de remover??\n', 
                                          exp_values = self.minhas_atividades.keys())
         if ativ in self.minhas_atividades:
