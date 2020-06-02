@@ -106,8 +106,8 @@ class personal_totivator:
     ## Setup Inicial ##
     ###################
 
-    print("####################################\n Bem vindo ao seu personal totivator \n####################################")
-    print('Hoje é dia', self.today, '\n\n')
+    print("#########################################\n ## Bem vindo ao seu personal totivator ##\n#########################################")
+    print('>>> Hoje é dia', self.today, '\n\n')
 
     ############################
     ## Lendo arquivo do drive ##
@@ -175,24 +175,29 @@ class personal_totivator:
     #atualizando palleta de cores
     self.color_palette = sns.color_palette("Set1", n_colors=len(self.minhas_atividades), desat=.5)
 
-  def cadastrar_log(self):
+  def cadastrar_log(self, force_date=None):
     """
     Método 
     """
+
+    if force_date is None:
+      data_avaliada = self.today
+    else:
+      data_avaliada = force_date
     
     if len(self.log_atividades) == 0:
-      self.log_atividades[self.today] = {}
+      self.log_atividades[data_avaliada] = {}
       print("####################################\n Identificamos que você não possui nenhum Log de atividades ainda...")
     
     #Printando atividades já atuadas no dia de hoje
     try:
-      self.log_atividades[self.today]
+      self.log_atividades[data_avaliada]
       print("\n####################################################################\nHoje, dia " +
-            self.today +
+            data_avaliada +
             ", você já atuou nas seguintes atividades \n")
       
-      for atividade in self.log_atividades[self.today]:
-        atuacao = self.log_atividades[self.today][atividade]
+      for atividade in self.log_atividades[data_avaliada]:
+        atuacao = self.log_atividades[data_avaliada][atividade]
 
         print('\nAtividade:##########\n', atividade)
         print('Atuação:##########\n', atuacao)
@@ -208,12 +213,12 @@ class personal_totivator:
           print(atividade,'que já foram realizados', atividade, 'minutos de', meta, 'estipulados!')
 
           tempo_hoje = questionator_validator('\n#### Quantos minutos foram realizados nessa atividade hoje?\n', float)
-          self.log_atividades[self.today][atividade] = atividade + tempo_hoje
+          self.log_atividades[data_avaliada][atividade] = atividade + tempo_hoje
     
     except:      
-      self.log_atividades[self.today] = {}
+      self.log_atividades[data_avaliada] = {}
       print("\n######################################\nAeee, primeiro cadastro de atividade do dia " +
-            self.today +
+            data_avaliada +
             ", parabéns!")
 
       for i in self.minhas_atividades:
@@ -221,7 +226,7 @@ class personal_totivator:
         meta = self.minhas_atividades[i]['tempo_min'] 
         print('\n>>> Para a atividade:\n' + atividades + '\n>>> você indicou que atuaria:\n' + str(meta) + ' minutos diários...'  )
         tempo_hoje = questionator_validator('\n####\nQuantos minutos foram realizados da atividade ' + atividades + ' hoje?\n', float)
-        self.log_atividades[self.today][atividades] = tempo_hoje
+        self.log_atividades[data_avaliada][atividades] = tempo_hoje
 
     return
 
