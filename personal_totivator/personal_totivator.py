@@ -348,7 +348,7 @@ class personal_totivator:
       texto = ativ + ': ' + format(int(valor), ',d').replace(',','.') + 'min'
 
       ax1.text(i, valor, texto, 
-                      fontsize=16, color='Black',ha='center', bbox=dict(facecolor='white', alpha=0.8)) 
+                      fontsize=16, color='White',ha='center', bbox=dict(facecolor=self.color_palette[i], alpha=0.8)) 
       
 
   def plot_log_atividades(self, 
@@ -403,7 +403,7 @@ class personal_totivator:
                self.minhas_atividades[ativ]['tempo_min'], 
                'Meta diária: ' + str(self.minhas_atividades[ativ]['tempo_min']) + ' minutos',
                fontsize=16, 
-               color='Black',
+               color='White',
                ha='center', 
                bbox=dict(facecolor=cor, alpha=1)) 
       axe.set_facecolor('white')
