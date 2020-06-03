@@ -190,7 +190,7 @@ class personal_totivator:
       print("####################################\n Identificamos que você não possui nenhum Log de atividades ainda...")
     
     #Printando atividades já atuadas no dia de hoje
-    try:
+    if len(self.log_atividades[data_avaliada]) > 0:
       self.log_atividades[data_avaliada]
       print("\n####################################################################\nHoje, dia " +
             data_avaliada +
@@ -215,7 +215,7 @@ class personal_totivator:
           tempo_hoje = questionator_validator('\n#### Quantos minutos foram realizados nessa atividade hoje?\n', float)
           self.log_atividades[data_avaliada][atividade] = atividade + tempo_hoje
     
-    except:      
+    else:      
       self.log_atividades[data_avaliada] = {}
       print("\n######################################\nAeee, primeiro cadastro de atividade do dia " +
             data_avaliada +
@@ -376,7 +376,7 @@ class personal_totivator:
     ##################################
 
     quantidade_atividades = len(self.minhas_atividades)
-    fig2, axs = plt.subplots(figsize= figsize, nrows= (quantidade_atividades), sharex=sharex)
+    fig, axs = plt.subplots(figsize= figsize, nrows= (quantidade_atividades), sharex=sharex)
 
     for axe, ativ, cor in zip(axs, self.minhas_atividades.keys(), self.color_palette):
       #Tratando o DF
@@ -407,6 +407,7 @@ class personal_totivator:
                ha='center', 
                bbox=dict(facecolor=cor, alpha=1)) 
       axe.set_facecolor('white')
+    fig.autofmt_xdate()
 
     # Turns off grid on the left Axis.
     sns.despine(bottom = True, left = True)
