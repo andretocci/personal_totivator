@@ -121,9 +121,9 @@ class personal_totivator:
         dict_file = ast.literal_eval(dict_file)
 
         #Atribuindo valores
-        self.minhas_atividades = dict_file['self.minhas_atividades']
-        self.log_atividades = dict_file['self.log_atividades']
-        self.atividades_arquivadas = dict_file['self.atividades_arquivadas']
+        self.minhas_atividades = dict_file['minhas_atividades']
+        self.log_atividades = dict_file['log_atividades']
+        self.atividades_arquivadas = dict_file['atividades_arquivadas']
         self.color_palette = sns.color_palette("Set1", n_colors=len(self.minhas_atividades), desat=.5)
 
         #Setando para não ler arquivo local
@@ -138,9 +138,9 @@ class personal_totivator:
       dict_file = read_dict_file
 
       #Atribuindo valores
-      self.minhas_atividades = dict_file['self.minhas_atividades']
-      self.log_atividades = dict_file['self.log_atividades']
-      self.atividades_arquivadas = dict_file['self.atividades_arquivadas']
+      self.minhas_atividades = dict_file['minhas_atividades']
+      self.log_atividades = dict_file['log_atividades']
+      self.atividades_arquivadas = dict_file['atividades_arquivadas']
       self.color_palette = sns.color_palette("Set1", n_colors=len(self.minhas_atividades), desat=.5)
 
       #Setando para não ler arquivo local
@@ -250,13 +250,15 @@ class personal_totivator:
     for ativ in atividade:
       while ativ not in self.minhas_atividades:
         print('###\nNão encontramos a seguinte atividade nos seus cadastros:\n', ativ)
-        print('\n#####################################\nEssas são suas atividades cadastradas:\n\n', ';\n'.join(self.minhas_atividades.keys()))
+        print("""\n#####################################\n
+                >>> Essas são suas atividades cadastradas:\n""", ';\n'.join(self.minhas_atividades.keys()))
         ativ = questionator_validator('##############################\nQual seria a atividade que gostaria de remover??\n', 
                                          exp_values = self.minhas_atividades.keys())
         if ativ in self.minhas_atividades:
           continue
       self.atividades_arquivadas[ativ] = self.minhas_atividades[ativ]
-      motivo = questionator_validator('\n##############################\nPor que você está arquivando essa atividade?\nA atividade foi concluída ou paudada?\n', 
+      motivo = questionator_validator("""\n##############################\n
+                                          >>> Por que você está arquivando essa atividade? A atividade foi concluída ou paudada?\n""", 
                                          exp_values = ['Concluida', 'Pausada', 'PQ tu ta querendo saber isso manoww'])
       self.atividades_arquivadas[ativ]['motivo'] = motivo
       del self.minhas_atividades[ativ]
@@ -417,7 +419,8 @@ class personal_totivator:
   def old_plot_log_atividades(self, 
                           dados_cumulativos = False, 
                           plot_type =  sns.barplot, 
-                          date_range = None, 
+                          max_date = None, 
+                          min_date = None, 
                           figsize=(11,7), 
                           sharex=True):
     """
@@ -426,8 +429,8 @@ class personal_totivator:
     log_atividades_df = self.log_atividades_df()
     log_atividades_df = pd.merge( log_atividades_df, self.minhas_atividades_df()[['Atividades', 'Meta_por_dia']], how='left', on='Atividades')
 
-    if date_range is not None:
-      log_atividades_df = log_atividades_df[date_range]
+    if (min_date is not None) | (max_date is not None) :
+      log_atividades_df = log_atividades_df[min_date :max_date]
 
     ###########
     ## Plots ##
