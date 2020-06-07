@@ -190,8 +190,7 @@ class personal_totivator:
       print("####################################\n Identificamos que você não possui nenhum Log de atividades ainda...")
     
     #Printando atividades já atuadas no dia de hoje
-    if len(self.log_atividades[data_avaliada]) > 0:
-      self.log_atividades[data_avaliada]
+    if data_avaliada in self.log_atividades:
       print("\n####################################################################\nHoje, dia " +
             data_avaliada +
             ", você já atuou nas seguintes atividades \n")
@@ -212,7 +211,7 @@ class personal_totivator:
           meta = self.minhas_atividades[atividade]['tempo_min']
           print(atividade,'que já foram realizados', atividade, 'minutos de', meta, 'estipulados!')
 
-          tempo_hoje = questionator_validator('\n#### Quantos minutos foram realizados nessa atividade hoje?\n', float)
+          tempo_hoje = questionator_validator('>>> Quantos minutos foram realizados nessa atividade hoje?\n', float)
           self.log_atividades[data_avaliada][atividade] = atividade + tempo_hoje
     
     else:      
@@ -224,8 +223,8 @@ class personal_totivator:
       for i in self.minhas_atividades:
         atividades = i
         meta = self.minhas_atividades[i]['tempo_min'] 
-        print('\n>>> Para a atividade:\n' + atividades + '\n>>> você indicou que atuaria:\n' + str(meta) + ' minutos diários...'  )
-        tempo_hoje = questionator_validator('\n####\nQuantos minutos foram realizados da atividade ' + atividades + ' hoje?\n', float)
+        print('\n### Para a atividade ' + atividades + ' você indicou que atuaria: ' + str(meta) + ' minutos diários...'  )
+        tempo_hoje = questionator_validator('>>> Quantos minutos foram realizados da atividade ' + atividades + ' hoje?\n', float)
         self.log_atividades[data_avaliada][atividades] = tempo_hoje
 
     return
@@ -241,32 +240,63 @@ class personal_totivator:
     with open(self.drive_path + self.drive_filename + '.json', 'w') as f:
       f.write(str(self.__dict__))
 
-  def arquivar_atividades(self, atividade):
+  def arquivar_atividades(self, nome_da_atividade, retomar_atividade = False):
 
-    if isinstance(atividade, str):
-      atividade = [atividade]
+    if isinstance(nome_da_atividade, str):
+      nome_da_atividade = [nome_da_atividade]
 
-    remover = []
-    for ativ in atividade:
-      while ativ not in self.minhas_atividades:
-        print('###\nNão encontramos a seguinte atividade nos seus cadastros:\n', ativ)
-        print("""\n#####################################\n
-                >>> Essas são suas atividades cadastradas:\n""", ';\n'.join(self.minhas_atividades.keys()))
-        ativ = questionator_validator('##############################\nQual seria a atividade que gostaria de remover??\n', 
-                                         exp_values = self.minhas_atividades.keys())
-        if ativ in self.minhas_atividades:
-          continue
-      self.atividades_arquivadas[ativ] = self.minhas_atividades[ativ]
-      motivo = questionator_validator("""\n##############################\n
-                                          >>> Por que você está arquivando essa atividade? A atividade foi concluída ou paudada?\n""", 
-                                         exp_values = ['Concluida', 'Pausada', 'PQ tu ta querendo saber isso manoww'])
-      self.atividades_arquivadas[ativ]['motivo'] = motivo
-      del self.minhas_atividades[ativ]
+    if len(self.atividades_arquivadas) > 0:
+      print('>>> Encontramos as seguintes atividades arquivadas\n')
+      for ativ in self.atividades_arquivadas:
+        print('Atividade:', ativ)
+        print('Motivo:', self.atividades_arquivadas[ativ]['arquivamento']['motivo'])
+        print('Data de Arquivamento:', self.atividades_arquivadas[ativ]['arquivamento']['data_arquivamento'])
+        print('\n')
 
-      remover.append(ativ)
-      
+    if not retomar_atividade:
+      for ativ in nome_da_atividade:
+        while ativ not in self.minhas_atividades:
+          print('###\nNão encontramos a seguinte atividade nos seus cadastros:\n', ativ)
+          print("""\n#####################################\n
+                  >>> Essas são suas atividades cadastradas:\n""", ';\n'.join(self.minhas_atividades.keys()))
+          ativ = questionator_validator('##############################\nQual seria a atividade que gostaria de remover??\n', 
+                                          exp_values = self.minhas_atividades.keys())
+          if ativ in self.minhas_atividades:
+            break
+        
+        self.atividades_arquivadas[ativ] = self.minhas_atividades[ativ]
+        motivo = questionator_validator("""\n##############################\n
+                                            >>> Por que você está arquivando essa atividade? A atividade foi concluída ou paudada?\n""", 
+                                          exp_values = ['Concluida', 'Pausada', 'PQ tu ta querendo saber isso manoww'])
+        #Validando se a chave arquivamento existe
+        if 'arquivamento' not in self.atividades_arquivadas[ativ]:
+          self.atividades_arquivadas[ativ]['arquivamento'] = {}
+          self.atividades_arquivadas[ativ]['arquivamento']['motivo'] = [motivo]
+          self.atividades_arquivadas[ativ]['arquivamento']['data_arquivamento'] = [self.today]
+          del self.minhas_atividades[ativ]
+        else:
+          self.atividades_arquivadas[ativ]['arquivamento']['motivo'].append(motivo)
+          self.atividades_arquivadas[ativ]['arquivamento']['data_arquivamento'].append(self.today)
+    else:
+      for ativ in nome_da_atividade:
+        while ativ not in self.atividades_arquivadas:
+          print('###\nNão encontramos a seguinte atividade nos seus cadastros:\n', ativ)
+          print(""">>> Essas são suas atividades arquivadas:\n""", ';\n'.join(self.atividades_arquivadas.keys()))
+          ativ = questionator_validator('>>> Qual seria a atividade que gostaria de retomar??\n', 
+                                          exp_values = self.atividades_arquivadas.keys())
+          print(ativ, ativ in self.atividades_arquivadas)
+          
+          if ativ in self.atividades_arquivadas:
+            break
+      if 'retomada' not in self.atividades_arquivadas[ativ]['arquivamento']:
+        self.atividades_arquivadas[ativ]['arquivamento']['retomada'] = [self.today]
+      else:
+        self.atividades_arquivadas[ativ]['arquivamento']['retomada'].append(self.today)
+      self.minhas_atividades[ativ] = self.atividades_arquivadas[ativ]
+      del self.atividades_arquivadas[ativ]
+
     #atualizando palleta de cores
-    self.color_palette = sns.color_palette("Set1", n_colors=len(self.minhas_atividades), desat=.5)
+    self.atualizar_paleta()
       
     return ativ
 
@@ -275,9 +305,9 @@ class personal_totivator:
     Retorna um DataFrame contendo as atividades cadastradas.
     Colunas = ['Atividades', 'Meta_por_dia', 'data_cadastro']
     """
-    minhas_atividades_df = pd.DataFrame(self.minhas_atividades).T
+    minhas_atividades_df = pd.DataFrame.from_dict(self.minhas_atividades, orient='index')
     minhas_atividades_df = minhas_atividades_df.reset_index()
-    minhas_atividades_df.columns = ['Atividades', 'Meta_por_dia', 'data_cadastro']
+    minhas_atividades_df.columns = ['Atividades', 'Meta_por_dia', 'data_cadastro', 'arquivamento']
 
     return minhas_atividades_df
 
