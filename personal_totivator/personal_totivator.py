@@ -126,8 +126,9 @@ class personal_totivator:
         self.atividades_arquivadas = dict_file['atividades_arquivadas']
         self.color_palette = sns.color_palette("Set1", n_colors=len(self.minhas_atividades), desat=.5)
 
-        #Setando para não ler arquivo local
-        read_dict_file = False
+      #Setando para não ler arquivo local
+      read_dict_file = False
+
     
     ############################
     ## Lendo arquivo do Local ##
@@ -156,6 +157,9 @@ class personal_totivator:
       self.cadastrar_novas_atividades()
       self.atividades_arquivadas = {}
       self.color_palette = {}
+    else:      
+      print('Arquivo com historico lido!')
+      self.plot_log_atividades()
    
   
 
@@ -495,6 +499,38 @@ class personal_totivator:
       axe.set_xlabel('')
       axe.set_ylabel('')
       axe.set_title(ativ)
+      axe.set_facecolor('white')
+
+    # Turns off grid on the left Axis.
+    sns.despine(bottom = True, left = True)
+    #ajusta o layout dos subplots
+    plt.tight_layout()
+
+  def plot_describe(self, plot_type = sns.boxplot):
+    """
+    plot_type = Pode ser um dos sns.boxplot, ou sns.swarmplot, ou sns.violinplot
+    """
+
+    #Criando DF do log
+    df = self.log_atividades_df()
+    # Filtrando dados zerados
+    df = df[df.tempo > 0].copy()
+
+    #Criando figura
+    # ax = sns.swarmplot(x="Atividades", y="tempo", data=df, palette= personal_t2.color_palette,  edgecolor = 'white', linewidth=2,size=10)
+    fig, axs = plt.subplots(1, 2, sharey= True, figsize=(20,5))
+    plot_type(y="Atividades", x="tempo", data=df, palette= personal_t2.color_palette, linewidth=2, ax = axs[1])
+
+
+    #Agrupando dados por atividades
+    df2 = df.groupby(['Atividades'])['tempo'].sum().reset_index() #.agg({'tempo': ['sum']})
+    sns.barplot(y="Atividades", x="tempo", data= df2, palette= personal_t2.color_palette, ax = axs[0])
+
+    for axe in axs:
+      # axe.legend(frameon=True, fancybox=True,loc='lower right')
+      # axe.set_xlabel('')
+      # axe.set_ylabel('')
+      # axe.set_title(ativ)
       axe.set_facecolor('white')
 
     # Turns off grid on the left Axis.
