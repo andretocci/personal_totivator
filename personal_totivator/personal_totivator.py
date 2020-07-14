@@ -524,7 +524,7 @@ class personal_totivator:
 
     #Agrupando dados por atividades
     df2 = df.groupby(['Atividades'])['tempo'].sum().reset_index() #.agg({'tempo': ['sum']})
-    sns.barplot(y="Atividades", x="tempo", data= df2, palette= personal_t2.color_palette, ax = axs[0])
+    sns.barplot(y="Atividades", x="tempo", data= df2, palette= self.color_palette, ax = axs[0])
 
     for axe in axs:
       # axe.legend(frameon=True, fancybox=True,loc='lower right')
