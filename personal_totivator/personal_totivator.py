@@ -519,7 +519,7 @@ class personal_totivator:
     #Criando figura
     # ax = sns.swarmplot(x="Atividades", y="tempo", data=df, palette= personal_t2.color_palette,  edgecolor = 'white', linewidth=2,size=10)
     fig, axs = plt.subplots(1, 2, sharey= True, figsize=(20,5))
-    plot_type(y="Atividades", x="tempo", data=df, palette= personal_t2.color_palette, linewidth=2, ax = axs[1])
+    plot_type(y="Atividades", x="tempo", data=df, palette= self.color_palette, linewidth=2, ax = axs[1])
 
 
     #Agrupando dados por atividades
